@@ -1,0 +1,11 @@
+{
+  "name": "outpost",
+  "version": "1.0.0",
+  "description": "A real time strategy game involving colonists on a survival mission",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Daniel Whiffing",
+  "license": "ISC"
+}

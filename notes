@@ -1,0 +1,22 @@
+Map
+  Phaser tilemap
+  each tile has light value
+
+Structure
+  each tile can have one structure
+  in order to build structures, colonists must have access, they will take metal from storage to site
+  types:
+    command center - starting point, generates small amount of power and supports 2 colonists
+    tube - connects tiles for colonist access
+    solar panel - generates power, not walkable, not workable
+    biodome - consumes power, creates food, workable, walkable
+    fabricator - consumes power, creates metal, workable, walkable
+    barracks - consumes power, supports colonists, walkable
+    storage - stores surplus resources, not workable, walkable
+
+
+start game with 1 colonist and command center and some power/metal
+  use starting resources to build up colonist count and survive as long as possible
+
+day night cycle
+  tiles can be in light or shade, power output varies
