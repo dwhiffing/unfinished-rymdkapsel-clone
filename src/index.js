@@ -9,7 +9,7 @@ import LoadState from './states/load'
 import PlayState from './states/play'
 
 (function() {
-  let game = new Phaser.Game(667, 375, Phaser.AUTO, 'app')
+  let game = new Phaser.Game(375, 667, Phaser.AUTO, 'app')
 
   game.state.add('boot', BootState)
   game.state.add('load', LoadState)

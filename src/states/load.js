@@ -3,6 +3,7 @@ export default {
     this.load.onLoadComplete.addOnce(this.onLoadComplete, this)
 
     this.load.image('rock', 'images/rock2.png')
+    this.load.spritesheet('rockSheet', 'images/rock2.png', 64, 64)
   },
 
   onLoadComplete() {
