@@ -20,3 +20,44 @@ start game with 1 colonist and command center and some power/metal
 
 day night cycle
   tiles can be in light or shade, power output varies
+
+
+Interface
+  Manages user input
+  Manages resources
+  attrs
+    keys
+
+  methods
+    clickTile
+    selectStructure
+    selectColonist
+    selectStructureToPlace
+    placeStructure
+    checkCost
+    _displayStructurePanel
+    _displayPlaceStructurePanel
+    _displayColonistPanel
+
+Map
+  Manages tilemap
+  methods
+    getTile
+    getTileXY
+    createStructureBlueprint
+
+Structure
+  Represents game structure
+  Attrs
+    cost
+    effect
+    workable
+    walkable
+    numWorking
+    effectCost
+  methods
+    sell
+    getEffect
+
+Colonist
+  Represents game unit

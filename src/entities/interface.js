@@ -1,5 +1,9 @@
+import { typeLabel, structureCosts } from '../utils'
+
 let cursors, pathKey, escKey, bioKey, solarKey, massKey
-let marker, selectedStructure, panel
+let aKey, wKey, sKey, dKey
+let marker, panel
+const cameraSpeed = 7
 
 export default class Interface {
   constructor(game, tileSize) {
@@ -8,15 +12,21 @@ export default class Interface {
 
     cursors = game.input.keyboard.createCursorKeys()
 
+    wKey = game.input.keyboard.addKey(Phaser.Keyboard.W)
+    aKey = game.input.keyboard.addKey(Phaser.Keyboard.A)
+    sKey = game.input.keyboard.addKey(Phaser.Keyboard.S)
+    dKey = game.input.keyboard.addKey(Phaser.Keyboard.D)
+
     pathKey = game.input.keyboard.addKey(Phaser.Keyboard.ONE)
     bioKey = game.input.keyboard.addKey(Phaser.Keyboard.TWO)
     solarKey = game.input.keyboard.addKey(Phaser.Keyboard.THREE)
     massKey = game.input.keyboard.addKey(Phaser.Keyboard.FOUR)
     escKey = game.input.keyboard.addKey(Phaser.Keyboard.ESC)
-    game.input.addMoveCallback(this.updateMarker, this)
+    game.input.addMoveCallback(this.updateCursor, this)
 
-    selectedStructure = game.add.sprite(50, 50, 'rockSheet')
-    selectedStructure.alpha = 0
+    this.selectedStructure = game.add.sprite(50, 50, 'rockSheet')
+    this.selectedStructure.alpha = 0
+    this.currentTile = null
 
     marker = game.add.graphics()
     marker.lineStyle(2, 0x000000, 1)
@@ -27,19 +37,18 @@ export default class Interface {
     panel.drawRect(0, game.height/2, game.width, game.height/2)
     panel.endFill()
     panel.fixedToCamera = true
-    this.currentTile = {x:0,y:0}
   }
 
   update() {
-    if (cursors.left.isDown) {
-      this.game.camera.x -= 10
-    } else if (cursors.right.isDown) {
-      this.game.camera.x += 10
+    if (cursors.left.isDown || aKey.isDown) {
+      this.game.camera.x -= cameraSpeed
+    } else if (cursors.right.isDown || dKey.isDown) {
+      this.game.camera.x += cameraSpeed
     }
-    if (cursors.up.isDown) {
-      this.game.camera.y -= 10
-    } else if (cursors.down.isDown) {
-      this.game.camera.y += 10
+    if (cursors.up.isDown || wKey.isDown) {
+      this.game.camera.y -= cameraSpeed
+    } else if (cursors.down.isDown || sKey.isDown) {
+      this.game.camera.y += cameraSpeed
     }
     if (escKey.isDown) {
       this.updateStructure(-1)
@@ -58,33 +67,28 @@ export default class Interface {
     }
   }
 
-  updateMarker() {
-    let x = this.game.gameMap.groundLayer.getTileX(this.game.input.activePointer.worldX)
-    let y = this.game.gameMap.groundLayer.getTileY(this.game.input.activePointer.worldY)
+  updateCursor() {
+    const { worldX, worldY } = this.game.input.activePointer
+    const { x, y } = this.game.gameMap.getTileXY(worldX, worldY)
     marker.x = x * this.tileSize
     marker.y = y * this.tileSize
-    selectedStructure.x = marker.x
-    selectedStructure.y = marker.y
+    this.selectedStructure.x = marker.x
+    this.selectedStructure.y = marker.y
     if (this.game.input.mousePointer.justPressed(50)) {
-      if (selectedStructure.alpha === 0) {
-        this.currentTile = this.game.gameMap.map.getTile(x, y, this.game.gameMap.groundLayer, true)
+      if (this.selectedStructure.alpha === 0) {
+        this.currentTile = this.game.gameMap.getTile(x, y)
       } else {
-        map.putTile(
-          selectedStructure.frame,
-          this.game.gameMap.structureLayer.getTileX(marker.x),
-          this.game.gameMap.structureLayer.getTileY(marker.y),
-          this.game.gameMap.structureLayer
-        )
+        this.game.gameMap.placeStructure(marker.x, marker.y, this.selectedStructure.frame)
       }
     }
   }
 
   updateStructure(structure) {
     if (structure < 0) {
-      selectedStructure.alpha = 0
+      this.selectedStructure.alpha = 0
     } else {
-      selectedStructure.frame = structure
-      selectedStructure.alpha = 1
+      this.selectedStructure.frame = structure
+      this.selectedStructure.alpha = 1
     }
   }
 }
