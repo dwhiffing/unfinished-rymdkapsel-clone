@@ -31,15 +31,17 @@ export default {
   },
 
   render(game) {
-    game.debug.text(`energy: ${game.getResource('energy').toFixed(2)}, mass: ${game.getResource('mass').toFixed(2)}`, 16, 350);
-    if (game.interface.selectedStructure.alpha > 0) {
-      game.debug.text(`placing: ${game.interface.selectedStructure.frame}`, 16, 390);
-      // game.debug.text(`x: ${game.interface.currentTile.x}, y: ${game.interface.currentTile.y}`, 16, 420);
-    } else if (game.interface.currentTile) {
-      let tile = game.interface.currentTile
-      game.debug.text(`selected: ${tile.index}`, 16, 390);
-      game.debug.text(`x: ${tile.x}, y: ${tile.y}`, 16, 420);
-      game.debug.text(`energy: ${tile.structure.energyCost}, mass ${tile.structure.massCost}`, 16, 450);
+    game.debug.text(`energy: ${game.getResource('energy')}, mass: ${game.getResource('mass').toFixed(2)}`, 16, 350);
+    const current = game.interface.currentTile
+    const placing = game.interface.placingStructure
+    if (placing.alpha > 0) {
+      game.debug.text(`placing: ${placing.frame}`, 16, 390);
+      game.debug.text(`x: ${placing.x}, y: ${placing.y}`, 16, 420);
+      game.debug.text(`energy: ${placing.structure.energy}, mass: ${placing.structure.mass}`, 16, 450);
+    } else if (current) {
+      game.debug.text(`selected: ${current.index}`, 16, 390);
+      game.debug.text(`x: ${current.x}, y: ${current.y}`, 16, 420);
+      game.debug.text(`energy: ${current.structure.energy}, mass ${current.structure.mass}`, 16, 450);
     }
   }
 }

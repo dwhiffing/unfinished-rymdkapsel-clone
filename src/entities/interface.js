@@ -24,8 +24,8 @@ export default class Interface {
     escKey = game.input.keyboard.addKey(Phaser.Keyboard.ESC)
     game.input.addMoveCallback(this.updateCursor, this)
 
-    this.selectedStructure = game.add.sprite(50, 50, 'rockSheet')
-    this.selectedStructure.alpha = 0
+    this.placingStructure = game.add.sprite(50, 50, 'rockSheet')
+    this.placingStructure.alpha = 0
     this.currentTile = null
 
     marker = game.add.graphics()
@@ -51,44 +51,74 @@ export default class Interface {
       this.game.camera.y += cameraSpeed
     }
     if (escKey.isDown) {
-      this.updateStructure(-1)
+      this.startPlacingStructure(-1)
     }
     if (pathKey.isDown) {
-      this.updateStructure(6)
+      this.startPlacingStructure(6)
     }
     if (bioKey.isDown) {
-      this.updateStructure(8)
+      this.startPlacingStructure(8)
     }
     if (solarKey.isDown) {
-      this.updateStructure(9)
+      this.startPlacingStructure(9)
     }
     if (massKey.isDown) {
-      this.updateStructure(10)
+      this.startPlacingStructure(10)
+    }
+  }
+
+  canAfford(costs) {
+    const currentEnergy = this.game.getResource('energy')
+    const currentMass = this.game.getResource('mass')
+    return currentEnergy >= costs.energy && currentMass >= costs.mass
+  }
+
+  purchase(type) {
+    const currentEnergy = this.game.getResource('energy')
+    const currentMass = this.game.getResource('mass')
+    const costs = this.getCost(type)
+    if (this.canAfford(costs)) {
+      this.game.setResource('energy', currentEnergy - costs.energy)
+      this.game.setResource('mass', currentMass - costs.mass)
+      return true
+    }
+    return false
+  }
+
+  getCost(type) {
+    const label = typeLabel[type]
+    const costs = structureCosts[label]
+    if (label === 'path') return costs
+    return {
+      energy: Math.round(costs.energy * Math.pow(1.17, this.game.getStructure(label).length)),
+      mass: (costs.mass * Math.pow(1.15, this.game.getStructure(label).length)).toFixed(2),
     }
   }
 
   updateCursor() {
     const { worldX, worldY } = this.game.input.activePointer
     const { x, y } = this.game.gameMap.getTileXY(worldX, worldY)
+    const type = this.placingStructure.frame
     marker.x = x * this.tileSize
     marker.y = y * this.tileSize
-    this.selectedStructure.x = marker.x
-    this.selectedStructure.y = marker.y
+    this.placingStructure.x = marker.x
+    this.placingStructure.y = marker.y
     if (this.game.input.mousePointer.justPressed(50)) {
-      if (this.selectedStructure.alpha === 0) {
+      if (this.placingStructure.alpha === 0) {
         this.currentTile = this.game.gameMap.getTile(x, y)
-      } else {
-        this.game.gameMap.placeStructure(marker.x, marker.y, this.selectedStructure.frame)
+      } else if (this.purchase(type)) {
+        this.game.gameMap.placeStructure(marker.x, marker.y, type)
       }
     }
   }
 
-  updateStructure(structure) {
-    if (structure < 0) {
-      this.selectedStructure.alpha = 0
+  startPlacingStructure(type) {
+    if (type < 0) {
+      this.placingStructure.alpha = 0
     } else {
-      this.selectedStructure.frame = structure
-      this.selectedStructure.alpha = 1
+      this.placingStructure.frame = type
+      this.placingStructure.alpha = 1
+      this.placingStructure.structure = this.getCost(type)
     }
   }
 }

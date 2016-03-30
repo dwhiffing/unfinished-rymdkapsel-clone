@@ -50,7 +50,7 @@ export default class GameMap {
   update() {
     const currentEnergy = this.game.getResource('energy')
     const currentMass = this.game.getResource('mass')
-    const energyInc = this.game.getStructure('energy').length + this.game.getStructure('center').length * 0.5
+    const energyInc = this.game.getStructure('energy').length + this.game.getStructure('center').length * 5
     const massInc = this.game.getStructure('mass').length * 0.1 + this.game.getStructure('center').length * 0.05
     this.game.setResource('energy', currentEnergy + energyInc)
     this.game.setResource('mass', currentMass + massInc)

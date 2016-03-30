@@ -10,24 +10,24 @@ export const typeLabel = {
 
 export const structureCosts = {
   path: {
-    metal: 2,
+    mass: 1,
     energy: 10,
   },
   center: {
-    metal: 100,
+    mass: 500,
     energy: 1000,
   },
   bio: {
-    metal: 20,
+    mass: 50,
     energy: 100,
   },
   energy: {
-    metal: 10,
+    mass: 5,
     energy: 100,
   },
   mass: {
-    metal: 30,
-    energy: 1000,
+    mass: 2,
+    energy: 50,
   },
 }
 
