@@ -28,6 +28,9 @@ export const get = (context, defaultValue) => {
 export const set = (context) => {
   store[context] = {}
   return (key, value) => {
+    if (typeof value === 'function') {
+      value = value(store[context][key])
+    }
     return store[context][key] = value
   }
 }

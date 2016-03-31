@@ -25,16 +25,20 @@ export default class Interface {
     game.input.addMoveCallback(this.updateCursor, this)
 
     this.placingStructure = game.add.sprite(50, 50, 'rockSheet')
+    this.placingStructure.anchor.setTo(0.78, 0.78)
     this.placingStructure.alpha = 0
     this.currentTile = null
 
-    marker = game.add.graphics()
-    marker.lineStyle(2, 0x000000, 1)
-    marker.drawRect(0, 0, tileSize, tileSize)
+    marker = game.add.group()
+    const markerGraphics = game.add.graphics()
+    markerGraphics.lineStyle(2, 0x000000, 1)
+    markerGraphics.drawRect(0, 0, tileSize, tileSize)
+    marker.add(markerGraphics)
+    marker.add(this.placingStructure)
 
     panel = game.add.graphics()
     panel.beginFill(0x000000)
-    panel.drawRect(0, game.height/2, game.width, game.height/2)
+    panel.drawRect(0, game.height-200, game.width, game.height-200)
     panel.endFill()
     panel.fixedToCamera = true
   }
@@ -67,19 +71,18 @@ export default class Interface {
     }
   }
 
-  canAfford(costs) {
-    const currentEnergy = this.game.getResource('energy')
-    const currentMass = this.game.getResource('mass')
-    return currentEnergy >= costs.energy && currentMass >= costs.mass
+  canAfford(type) {
+    const costs = this.getCost(type)
+    return this.game.getResource('energy') >= costs.energy && this.game.getResource('mass') >= costs.mass
   }
 
   purchase(type) {
     const currentEnergy = this.game.getResource('energy')
     const currentMass = this.game.getResource('mass')
     const costs = this.getCost(type)
-    if (this.canAfford(costs)) {
-      this.game.setResource('energy', currentEnergy - costs.energy)
-      this.game.setResource('mass', currentMass - costs.mass)
+    if (this.canAfford(type)) {
+      this.game.setResource('energy', (e) => e - costs.energy)
+      this.game.setResource('mass', (m) => m - costs.mass)
       return true
     }
     return false
@@ -99,19 +102,38 @@ export default class Interface {
   updateCursor() {
     const { worldX, worldY } = this.game.input.activePointer
     const { x, y } = this.game.gameMap.getTileXY(worldX, worldY)
-    const type = this.placingStructure.frame
     marker.x = x * this.tileSize
     marker.y = y * this.tileSize
-    this.placingStructure.x = marker.x
-    this.placingStructure.y = marker.y
+
     if (this.game.input.mousePointer.justPressed(50)) {
-      if (this.placingStructure.alpha === 0) {
-        this.currentTile = this.game.gameMap.getTile(x, y)
-      } else if (!this.game.gameMap.isOccupied({x, y}) && this.game.gameMap.isConnectedToCenter({x, y}) && this.purchase(type)) {
-        this.game.gameMap.placeStructure(marker.x, marker.y, type)
-        this.startPlacingStructure(type)
-      }
+      this.onClick(x, y)
     }
+  }
+
+  onClick(x, y) {
+    const type = this.placingStructure.frame
+    if (this.placingStructure.alpha === 0) {
+      this.selectTile(x, y)
+    } else if (this.canPlaceStructure(x, y, type)) {
+      this.purchase(type)
+      this.tryPlaceStructure(x, y, type)
+      this.game.gameMap.placeStructure(marker.x, marker.y, type)
+      this.startPlacingStructure(type)
+    }
+  }
+
+  selectTile(x, y) {
+    this.currentTile = this.game.gameMap.getTile(x, y)
+  }
+
+  canPlaceStructure(x, y, type) {
+    const map  = this.game.gameMap
+    return !map.isOccupied({x, y}) && map.isConnectedToCenter({x, y}) && this.canAfford(type)
+  }
+
+  tryPlaceStructure(x, y, type) {
+    this.game.gameMap.placeStructure(marker.x, marker.y, type)
+    this.startPlacingStructure(type)
   }
 
   startPlacingStructure(type) {

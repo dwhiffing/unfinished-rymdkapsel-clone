@@ -38,18 +38,19 @@ export default {
   },
 
   render(game) {
-    game.debug.text(`energy: ${game.getResource('energy')}, mass: ${game.getResource('mass').toFixed(2)}`, 16, 350);
-    game.debug.text(`energy: ${getPerSecond(game, 'energy')}, mass: ${getPerSecond(game, 'mass').toFixed(2)}`, 16, 370);
+    const y = game.height - 170
+    game.debug.text(`energy: ${game.getResource('energy')}, mass: ${game.getResource('mass').toFixed(2)}`, 16, y);
+    game.debug.text(`energy: ${getPerSecond(game, 'energy')}, mass: ${getPerSecond(game, 'mass').toFixed(2)}`, 16, y + 30);
     const current = game.interface.currentTile
     const placing = game.interface.placingStructure
     if (placing.alpha > 0) {
-      game.debug.text(`placing: ${placing.frame}`, 16, 390);
-      game.debug.text(`x: ${placing.x}, y: ${placing.y}`, 16, 420);
-      game.debug.text(`energy: ${placing.structure.energy}, mass: ${placing.structure.mass}`, 16, 450);
+      game.debug.text(`placing: ${placing.frame}`, 16, y + 60);
+      game.debug.text(`x: ${placing.x}, y: ${placing.y}`, 16, y + 90);
+      game.debug.text(`energy: ${placing.structure.energy}, mass: ${placing.structure.mass}`, 16, y + 120);
     } else if (current) {
-      game.debug.text(`selected: ${current.index}`, 16, 390);
-      game.debug.text(`x: ${current.x}, y: ${current.y}`, 16, 420);
-      game.debug.text(`energy: ${current.structure.energy}, mass ${current.structure.mass}`, 16, 450);
+      game.debug.text(`selected: ${current.index}`, 16, y + 60);
+      game.debug.text(`x: ${current.x}, y: ${current.y}`, 16, y + 90);
+      game.debug.text(`energy: ${current.structure.energy}, mass ${current.structure.mass}`, 16, y + 120);
     }
   }
 }
