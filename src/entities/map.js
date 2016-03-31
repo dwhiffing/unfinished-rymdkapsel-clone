@@ -1,5 +1,5 @@
 import Structure from './structure'
-import { typeLabel } from '../utils'
+import PF from 'pathfinding'
 let map, layer1, layer2, store = {}
 
 export default class GameMap {
@@ -7,6 +7,7 @@ export default class GameMap {
     this.game = game
     this.map = game.add.tilemap(null, tileSize, tileSize)
     this.map.addTilesetImage('rock')
+    this.worldSize = worldSize
 
     this.groundLayer = this.map.create('level1', worldSize, worldSize, tileSize, tileSize)
     this.groundLayer.resizeWorld()
@@ -15,7 +16,8 @@ export default class GameMap {
 
     this.map.fill(0, 0, 0, worldSize, worldSize, this.groundLayer)
     this.placeStructure((worldSize*tileSize)/2, (worldSize*tileSize)/2, 7)
-    setInterval(this.update.bind(this), 500)
+    this.finder = new PF.AStarFinder()
+    this.createGrid()
   }
   getTileXY(x, y) {
     return {
@@ -30,6 +32,35 @@ export default class GameMap {
     }
     return tile
   }
+  getPath(one, two) {
+    return this.finder.findPath(one.x, one.y, two.x, two.y, this.grid)
+  }
+  isOccupied({x, y}) {
+    const tile = this.getTile(x, y)
+    return !!tile
+  }
+  isConnectedToCenter(tile) {
+    this.grid.setWalkableAt(tile.x, tile.y, true)
+    const thing = this.getPath({x:12, y:12}, tile)
+    this.grid.setWalkableAt(tile.x, tile.y, false)
+    this.createGrid()
+    return thing.length > 0
+  }
+  createGrid() {
+    let matrix = []
+    this.map.forEach((t) => {
+      if (typeof t.index === 'undefined') return
+      if (!matrix[t.y]) {
+        matrix[t.y] = []
+      }
+      if (t.index === 6 || t.index === 7) {
+        matrix[t.y].push(0)
+      } else {
+        matrix[t.y].push(1)
+      }
+    })
+    this.grid = new PF.Grid(matrix)
+  }
   placeStructure(worldX, worldY, type) {
     let {x, y} = this.getTileXY(worldX, worldY)
     let tile = this.getTile(x, y)
@@ -41,18 +72,11 @@ export default class GameMap {
         this.structureLayer
       )
       const tile = this.map.getTile(x, y, this.structureLayer, true)
-      let structure = new Structure(this.game, tile, typeLabel[type])
-      let thing = this.game.getStructure(typeLabel[type]).concat([structure])
-      this.game.setStructure(typeLabel[type], thing)
+      let structure = new Structure(this.game, tile)
+      let thing = this.game.getStructure(structure.label).concat([structure])
+      this.game.setStructure(structure.label, thing)
       tile.structure = structure
+      this.createGrid()
     }
-  }
-  update() {
-    const currentEnergy = this.game.getResource('energy')
-    const currentMass = this.game.getResource('mass')
-    const energyInc = this.game.getStructure('energy').length + this.game.getStructure('center').length * 5
-    const massInc = this.game.getStructure('mass').length * 0.1 + this.game.getStructure('center').length * 0.05
-    this.game.setResource('energy', currentEnergy + energyInc)
-    this.game.setResource('mass', currentMass + massInc)
   }
 }

@@ -1,6 +1,7 @@
 import GameMap from '../entities/map'
 import UserInterface from '../entities/interface'
 import { get, set } from '../utils'
+import { getPerSecond } from '../utils'
 
 let map, layer1, layer2
 let cursors, pathKey, escKey, bioKey, solarKey, massKey
@@ -19,19 +20,26 @@ export default {
     game.setResource('energy', 1000)
     game.setResource('mass', 10)
 
-    game.gameMap = new GameMap(game, 64, 49)
+    game.gameMap = new GameMap(game, 64, 25)
     game.interface = new UserInterface(game, 64)
 
     game.camera.x = game.world.width/2 - game.width/2
     game.camera.y = game.world.height/2 - game.height/2
+    setInterval(this.updateResources.bind(this, game), 500)
   },
 
   update(game) {
     game.interface.update()
   },
 
+  updateResources(game) {
+    game.setResource('energy', game.getResource('energy') + getPerSecond(game, 'energy'))
+    game.setResource('mass', game.getResource('mass') + getPerSecond(game, 'mass'))
+  },
+
   render(game) {
     game.debug.text(`energy: ${game.getResource('energy')}, mass: ${game.getResource('mass').toFixed(2)}`, 16, 350);
+    game.debug.text(`energy: ${getPerSecond(game, 'energy')}, mass: ${getPerSecond(game, 'mass').toFixed(2)}`, 16, 370);
     const current = game.interface.currentTile
     const placing = game.interface.placingStructure
     if (placing.alpha > 0) {

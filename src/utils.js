@@ -1,33 +1,18 @@
 const store = {}
-
-export const typeLabel = {
-  6: 'path',
-  7: 'center',
-  8: 'bio',
-  9: 'energy',
-  10: 'mass',
-}
-
-export const structureCosts = {
-  path: {
-    mass: 1,
-    energy: 10,
-  },
-  center: {
-    mass: 500,
-    energy: 1000,
-  },
-  bio: {
-    mass: 50,
-    energy: 100,
-  },
+const perSecond = {
   energy: {
-    mass: 5,
-    energy: 100,
+    path: 0,
+    bio: 0,
+    mass: 0,
+    center: 5,
+    energy: 1,
   },
   mass: {
-    mass: 2,
-    energy: 50,
+    path: 0,
+    bio: 0,
+    energy: 0,
+    center: 0.05,
+    mass: 0.2,
   },
 }
 
@@ -45,4 +30,15 @@ export const set = (context) => {
   return (key, value) => {
     return store[context][key] = value
   }
+}
+
+export const getPerSecond = (game, label) => {
+  const thing = perSecond[label]
+  let count = 0
+  Object.keys(thing).forEach(key => {
+    const value = thing[key]
+    if (value === 0) return
+    count += game.getStructure(key).length * value
+  })
+  return count
 }

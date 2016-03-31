@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "p2": "^0.7.1",
+    "pathfinding": "^0.4.17",
     "phaser": "^2.4.6"
   }
 }

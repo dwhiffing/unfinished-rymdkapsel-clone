@@ -1,4 +1,4 @@
-import { typeLabel, structureCosts } from '../utils'
+import { typeLabel, structure } from '../data'
 
 let cursors, pathKey, escKey, bioKey, solarKey, massKey
 let aKey, wKey, sKey, dKey
@@ -87,11 +87,12 @@ export default class Interface {
 
   getCost(type) {
     const label = typeLabel[type]
-    const costs = structureCosts[label]
+    const costs = structure[label]
+    const count = this.game.getStructure(label).length
     if (label === 'path') return costs
     return {
-      energy: Math.round(costs.energy * Math.pow(1.17, this.game.getStructure(label).length)),
-      mass: (costs.mass * Math.pow(1.15, this.game.getStructure(label).length)).toFixed(2),
+      energy: Math.round(costs.energy * Math.pow(1.17, count)),
+      mass: (costs.mass * Math.pow(1.15, count)).toFixed(2),
     }
   }
 
@@ -106,8 +107,9 @@ export default class Interface {
     if (this.game.input.mousePointer.justPressed(50)) {
       if (this.placingStructure.alpha === 0) {
         this.currentTile = this.game.gameMap.getTile(x, y)
-      } else if (this.purchase(type)) {
+      } else if (!this.game.gameMap.isOccupied({x, y}) && this.game.gameMap.isConnectedToCenter({x, y}) && this.purchase(type)) {
         this.game.gameMap.placeStructure(marker.x, marker.y, type)
+        this.startPlacingStructure(type)
       }
     }
   }
