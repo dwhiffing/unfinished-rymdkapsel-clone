@@ -5,7 +5,7 @@ const perSecond = {
     bio: 0,
     mass: 0,
     center: 5,
-    energy: 1,
+    energy: 3,
   },
   mass: {
     path: 0,

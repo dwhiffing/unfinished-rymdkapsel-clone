@@ -2,6 +2,7 @@ import GameMap from '../entities/map'
 import UserInterface from '../entities/interface'
 import { get, set } from '../utils'
 import { getPerSecond } from '../utils'
+import ColonistManager from '../entities/colonistManager'
 
 let map, layer1, layer2
 let cursors, pathKey, escKey, bioKey, solarKey, massKey
@@ -20,16 +21,24 @@ export default {
     game.setResource('energy', 1000)
     game.setResource('mass', 10)
 
+    game.tileSize = 64
+
     game.gameMap = new GameMap(game, 64, 25)
     game.interface = new UserInterface(game, 64)
+    game.colonists = new ColonistManager(game, game.world.width/2, game.world.height/2)
 
     game.camera.x = game.world.width/2 - game.width/2
     game.camera.y = game.world.height/2 - game.height/2
     setInterval(this.updateResources.bind(this, game), 500)
+    setInterval(this.updateColonists.bind(this, game), 500)
   },
 
   update(game) {
     game.interface.update()
+  },
+
+  updateColonists(game) {
+    game.colonists.update()
   },
 
   updateResources(game) {

@@ -77,8 +77,6 @@ export default class Interface {
   }
 
   purchase(type) {
-    const currentEnergy = this.game.getResource('energy')
-    const currentMass = this.game.getResource('mass')
     const costs = this.getCost(type)
     if (this.canAfford(type)) {
       this.game.setResource('energy', (e) => e - costs.energy)
@@ -128,7 +126,7 @@ export default class Interface {
 
   canPlaceStructure(x, y, type) {
     const map  = this.game.gameMap
-    return !map.isOccupied({x, y}) && map.isConnectedToCenter({x, y}) && this.canAfford(type)
+    return !map.isOccupied({x, y}) && map.isConnectedToCenter({x, y, type}) && this.canAfford(type)
   }
 
   tryPlaceStructure(x, y, type) {
